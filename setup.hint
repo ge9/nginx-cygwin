@@ -1,0 +1,5 @@
+category: Web
+requires: crypt libgd2 libGeoIP1 libopenssl098 libpcre0 libxml2 libxslt zlib0
+sdesc: "Web and mail proxy server"
+ldesc: "nginx [engine x] is an HTTP and reverse proxy server, as well as 
+a mail proxy server."

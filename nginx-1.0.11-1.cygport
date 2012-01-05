@@ -1,0 +1,50 @@
+
+HOMEPAGE="http://nginx.org/"
+SRC_URI="http://nginx.org/download/${P}.tar.gz"
+
+src_compile() {
+	lndirs
+	cd ${B}
+	./configure \
+		--prefix=/usr/share/nginx \
+		--sbin-path=/usr/sbin/nginx.exe \
+		--conf-path=/etc/nginx/nginx.conf \
+		--lock-path=/var/run/nginx/nginx.lock \
+		--pid-path=/var/run/nginx/nginx.pid \
+		--error-log-path=/var/log/nginx/error.log \
+		--http-log-path=/var/log/nginx/access.log \
+		--http-client-body-temp-path=/var/lib/nginx/client_body \
+		--http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+		--http-proxy-temp-path=/var/lib/nginx/proxy \
+		--http-scgi-temp-path=/var/lib/nginx/scgi \
+		--http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
+		--with-http_ssl_module \
+		--with-http_realip_module \
+		--with-http_addition_module \
+		--with-http_xslt_module \
+		--with-http_image_filter_module \
+		--with-http_geoip_module \
+		--with-http_sub_module \
+		--with-http_dav_module \
+		--with-http_flv_module \
+		--with-http_gzip_static_module \
+		--with-http_random_index_module \
+		--with-http_secure_link_module \
+		--with-http_degradation_module \
+		--with-http_stub_status_module \
+		--with-mail \
+		--with-mail_ssl_module \
+		--with-ipv6 \
+		--with-cc-opt="-DFD_SETSIZE=2048"
+
+	cygmake
+}
+
+src_install() {
+	cd ${B}
+	cyginstall
+
+	doman objs/nginx.8
+}
+
+KEEPDIRS="/var/lib/nginx /var/log/nginx /var/run/nginx"
