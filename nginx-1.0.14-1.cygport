@@ -1,6 +1,10 @@
+inherit perl
+
 
 HOMEPAGE="http://nginx.org/"
 SRC_URI="http://nginx.org/download/${P}.tar.gz"
+
+DEPS_PATH="/usr/sbin"
 
 src_compile() {
 	lndirs
@@ -32,19 +36,24 @@ src_compile() {
 		--with-http_secure_link_module \
 		--with-http_degradation_module \
 		--with-http_stub_status_module \
+		--with-http_perl_module \
 		--with-mail \
 		--with-mail_ssl_module \
 		--with-ipv6 \
 		--with-cc-opt="-DFD_SETSIZE=2048"
 
 	cygmake
+	cygmake -f objs/Makefile objs/src/http/modules/perl/blib/arch/auto/nginx/nginx.dll
 }
 
 src_install() {
 	cd ${B}
 	cyginstall
-
+	perl_postinst
 	doman objs/nginx.8
+
+	rm ${D}/etc/nginx/*.default
+	make_etc_defaults /etc/nginx
 }
 
 KEEPDIRS="/var/lib/nginx /var/log/nginx /var/run/nginx"
