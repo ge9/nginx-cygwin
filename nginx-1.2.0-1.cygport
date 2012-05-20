@@ -3,6 +3,7 @@ inherit perl
 
 HOMEPAGE="http://nginx.org/"
 SRC_URI="http://nginx.org/download/${P}.tar.gz"
+PATCH_URI="1.0.14-perl.patch"
 
 DEPS_PATH="/usr/sbin"
 
