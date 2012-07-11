@@ -25,11 +25,12 @@
  		$NGX_OBJS/src/http/modules/perl/Makefile
  	cp -p src/http/modules/perl/nginx.* $NGX_OBJS/src/http/modules/perl/
  
-@@ -31,6 +32,7 @@ $NGX_OBJS/src/http/modules/perl/Makefile
+@@ -31,6 +32,8 @@ $NGX_OBJS/src/http/modules/perl/Makefile
  			NGX_OPENSSL=$OPENSSL				\
  		$NGX_PERL Makefile.PL					\
  			LIB=$NGX_PERL_MODULES				\
 +			INSTALLDIRS=vendor				\
++			OPTIMIZE="\$(CFLAGS)"				\
  			INSTALLSITEMAN3DIR=$NGX_PERL_MODULES_MAN
  
  END
