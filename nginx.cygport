@@ -1,6 +1,12 @@
 inherit perl
 
-
+NAME="nginx"
+VERSION=1.2.4
+RELEASE=1
+CATEGORY="Web"
+SUMMARY="Web and mail proxy server"
+DESCRIPTION="nginx [engine x] is an HTTP and reverse proxy server, as well as
+a mail proxy server."
 HOMEPAGE="http://nginx.org/"
 SRC_URI="http://nginx.org/download/${P}.tar.gz"
 PATCH_URI="1.0.14-perl.patch"
