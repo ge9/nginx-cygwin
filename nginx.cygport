@@ -9,7 +9,10 @@ DESCRIPTION="nginx [engine x] is an HTTP and reverse proxy server, as well as
 a mail proxy server."
 HOMEPAGE="http://nginx.org/"
 SRC_URI="http://nginx.org/download/${NAME}-${VERSION}.tar.gz"
-PATCH_URI="1.4.3-perl.patch"
+PATCH_URI="
+	1.4.3-configure.patch
+	1.4.3-perl.patch
+"
 
 DEPS_PATH="/usr/sbin"
 
