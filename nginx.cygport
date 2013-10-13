@@ -1,15 +1,15 @@
 inherit perl
 
 NAME="nginx"
-VERSION=1.2.9
+VERSION=1.4.3
 RELEASE=1
 CATEGORY="Web"
 SUMMARY="Web and mail proxy server"
 DESCRIPTION="nginx [engine x] is an HTTP and reverse proxy server, as well as
 a mail proxy server."
 HOMEPAGE="http://nginx.org/"
-SRC_URI="http://nginx.org/download/${P}.tar.gz"
-PATCH_URI="1.0.14-perl.patch"
+SRC_URI="http://nginx.org/download/${NAME}-${VERSION}.tar.gz"
+PATCH_URI="1.4.3-perl.patch"
 
 DEPS_PATH="/usr/sbin"
 
@@ -56,7 +56,6 @@ src_compile() {
 src_install() {
 	cd ${B}
 	cyginstall
-	perl_postinst
 	doman objs/nginx.8
 
 	rm ${D}/etc/nginx/*.default
