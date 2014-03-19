@@ -1,7 +1,7 @@
 inherit perl
 
 NAME="nginx"
-VERSION=1.4.6
+VERSION=1.4.7
 RELEASE=1
 CATEGORY="Web"
 SUMMARY="Web and mail proxy server"
