@@ -1,14 +1,15 @@
 inherit perl
 
 NAME="nginx"
-VERSION=1.6.3
+VERSION=1.8.1
 RELEASE=1
 CATEGORY="Web"
 SUMMARY="Web and mail proxy server"
-DESCRIPTION="nginx [engine x] is an HTTP and reverse proxy server, as well as
-a mail proxy server."
+DESCRIPTION="nginx [engine x] is an HTTP and reverse proxy server, a mail proxy
+server, and a generic TCP/UDP proxy server."
 HOMEPAGE="http://nginx.org/"
 SRC_URI="http://nginx.org/download/${NAME}-${VERSION}.tar.gz"
+SRC_URI+=" nginx.init"
 PATCH_URI="
 	1.4.3-configure.patch
 	1.4.3-perl.patch
@@ -23,15 +24,15 @@ src_compile() {
 		--prefix=/usr/share/nginx \
 		--sbin-path=/usr/sbin/nginx.exe \
 		--conf-path=/etc/nginx/nginx.conf \
-		--lock-path=/var/run/nginx/nginx.lock \
-		--pid-path=/var/run/nginx/nginx.pid \
+		--lock-path=/var/run/nginx.lock \
+		--pid-path=/var/run/nginx.pid \
 		--error-log-path=/var/log/nginx/error.log \
 		--http-log-path=/var/log/nginx/access.log \
-		--http-client-body-temp-path=/var/lib/nginx/client_body \
-		--http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
-		--http-proxy-temp-path=/var/lib/nginx/proxy \
-		--http-scgi-temp-path=/var/lib/nginx/scgi \
-		--http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
+		--http-client-body-temp-path=/var/lib/nginx/tmp/client_body \
+		--http-fastcgi-temp-path=/var/lib/nginx/tmp/fastcgi \
+		--http-proxy-temp-path=/var/lib/nginx/tmp/proxy \
+		--http-scgi-temp-path=/var/lib/nginx/tmp/scgi \
+		--http-uwsgi-temp-path=/var/lib/nginx/tmp/uwsgi \
 		--with-http_ssl_module \
 		--with-http_realip_module \
 		--with-http_addition_module \
@@ -41,6 +42,8 @@ src_compile() {
 		--with-http_sub_module \
 		--with-http_dav_module \
 		--with-http_flv_module \
+		--with-http_mp4_module \
+		--with-http_gunzip_module \
 		--with-http_gzip_static_module \
 		--with-http_random_index_module \
 		--with-http_secure_link_module \
@@ -49,6 +52,8 @@ src_compile() {
 		--with-http_perl_module \
 		--with-mail \
 		--with-mail_ssl_module \
+		--with-pcre \
+		--with-pcre-jit \
 		--with-ipv6 \
 		--with-cc-opt="-DFD_SETSIZE=2048"
 
@@ -63,6 +68,9 @@ src_install() {
 
 	rm ${D}/etc/nginx/*.default
 	make_etc_defaults /etc/nginx
+
+	exeinto /etc/rc.d/init.d
+	newexe ${S}/nginx.init nginx
 }
 
-KEEPDIRS="/var/lib/nginx /var/log/nginx /var/run/nginx"
+KEEPDIRS="/var/lib/nginx/tmp /var/log/nginx"
