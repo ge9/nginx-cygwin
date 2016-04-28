@@ -1,7 +1,7 @@
 inherit perl
 
 NAME="nginx"
-VERSION=1.8.1
+VERSION=1.10.0
 RELEASE=1
 CATEGORY="Web"
 SUMMARY="Web and mail proxy server"
@@ -11,9 +11,33 @@ HOMEPAGE="http://nginx.org/"
 SRC_URI="http://nginx.org/download/${NAME}-${VERSION}.tar.gz"
 SRC_URI+=" nginx.init"
 PATCH_URI="
-	1.4.3-configure.patch
-	1.4.3-perl.patch
+	1.10.0-auto-os-cygwin.patch
+	1.10.0-conf-modules.patch
+	1.10.0-openssl.patch
+	1.10.0-perl.patch
 "
+
+PKG_NAMES="nginx"
+nginx_CONTENTS="
+	etc/defaults/etc/nginx/
+	etc/p*/*
+	etc/rc.d/init.d/nginx
+	usr/sbin/nginx.exe
+	usr/share/doc/${NAME}
+	usr/share/man/
+	usr/share/nginx/html/
+"
+
+modules=(http_geoip http_image_filter http_perl http_xslt_filter mail stream)
+for mod in ${modules[*]}
+do
+	PKG_NAMES+=" nginx-mod_${mod}"
+	declare nginx_mod_${mod}_CONTENTS="
+			usr/lib/nginx/modules/ngx_${mod}_module.so
+			usr/share/nginx/modules/mod_${mod}.conf
+	"
+done
+nginx_mod_http_perl_CONTENTS+=" ${PERL_VENDORARCH#/}"
 
 DEPS_PATH="/usr/sbin"
 
@@ -23,6 +47,7 @@ src_compile() {
 	./configure \
 		--prefix=/usr/share/nginx \
 		--sbin-path=/usr/sbin/nginx.exe \
+		--modules-path=/usr/lib/nginx/modules \
 		--conf-path=/etc/nginx/nginx.conf \
 		--lock-path=/var/run/nginx.lock \
 		--pid-path=/var/run/nginx.pid \
@@ -34,11 +59,12 @@ src_compile() {
 		--http-scgi-temp-path=/var/lib/nginx/tmp/scgi \
 		--http-uwsgi-temp-path=/var/lib/nginx/tmp/uwsgi \
 		--with-http_ssl_module \
+		--with-http_v2_module \
 		--with-http_realip_module \
 		--with-http_addition_module \
-		--with-http_xslt_module \
-		--with-http_image_filter_module \
-		--with-http_geoip_module \
+		--with-http_xslt_module=dynamic \
+		--with-http_image_filter_module=dynamic \
+		--with-http_geoip_module=dynamic \
 		--with-http_sub_module \
 		--with-http_dav_module \
 		--with-http_flv_module \
@@ -48,16 +74,20 @@ src_compile() {
 		--with-http_random_index_module \
 		--with-http_secure_link_module \
 		--with-http_degradation_module \
+		--with-http_slice_module \
 		--with-http_stub_status_module \
-		--with-http_perl_module \
-		--with-mail \
+		--with-http_perl_module=dynamic \
+		--with-mail=dynamic \
 		--with-mail_ssl_module \
 		--with-pcre \
 		--with-pcre-jit \
+		--with-stream=dynamic \
+		--with-stream_ssl_module \
 		--with-ipv6 \
 		--with-cc-opt="-DFD_SETSIZE=2048"
 
-	cygmake
+	cygmake -f objs/Makefile binary
+	cygmake -f objs/Makefile
 	cygmake -f objs/Makefile objs/src/http/modules/perl/blib/arch/auto/nginx/nginx.dll
 }
 
@@ -71,6 +101,13 @@ src_install() {
 
 	exeinto /etc/rc.d/init.d
 	newexe ${S}/nginx.init nginx
+
+	dodir /usr/share/nginx/modules
+	for mod in ${modules[*]}
+	do
+		echo "load_module \"/usr/lib/nginx/modules/ngx_${mod}_module.so\";" \
+			> ${D}/usr/share/nginx/modules/mod_${mod}.conf
+	done
 }
 
 KEEPDIRS="/var/lib/nginx/tmp /var/log/nginx"

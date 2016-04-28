@@ -1,0 +1,45 @@
+--- origsrc/nginx-1.10.0/auto/lib/perl/conf	2016-04-26 08:31:19.000000000 -0500
++++ src/nginx-1.10.0/auto/lib/perl/conf	2016-04-27 11:49:40.302444000 -0500
+@@ -64,7 +64,7 @@ if test -n "$NGX_PERL_VER"; then
+         CORE_LINK="$CORE_LINK $ngx_perl_ldopts"
+     fi
+ 
+-    NGX_LIB_PERL="$ngx_perl_ldopts"
++    NGX_LIB_PERL="$ngx_perl_ldopts -Wl,--out-implib,$NGX_OBJS/libnginx_perl.a"
+ 
+     if test -n "$NGX_PERL_MODULES"; then
+         have=NGX_PERL_MODULES value="(u_char *) \"$NGX_PERL_MODULES\""
+--- origsrc/nginx-1.10.0/auto/lib/perl/make	2016-04-26 08:31:19.000000000 -0500
++++ src/nginx-1.10.0/auto/lib/perl/make	2016-04-27 11:15:01.174428300 -0500
+@@ -8,11 +8,9 @@ v=`grep 'define NGINX_VERSION' src/core/
+ 
+ cat << END                                                    >> $NGX_MAKEFILE
+ 
+-$NGX_OBJS/src/http/modules/perl/ngx_http_perl_module.o: \\
+-		$NGX_OBJS/$ngx_perl_module
+-
+ $NGX_OBJS/$ngx_perl_module: \\
+ 		\$(CORE_DEPS) \$(HTTP_DEPS) \\
++		$NGX_OBJS/nginx \\
+ 		src/http/modules/perl/ngx_http_perl_module.h \\
+ 		$NGX_OBJS/src/http/modules/perl/Makefile
+ 	cd $NGX_OBJS/src/http/modules/perl && \$(MAKE)
+@@ -39,6 +37,8 @@ $NGX_OBJS/src/http/modules/perl/Makefile
+ 			NGX_DEPS="\$(CORE_DEPS) \$(HTTP_DEPS)" \\
+ 		$NGX_PERL Makefile.PL \\
+ 			LIB=$NGX_PERL_MODULES \\
++			INSTALLDIRS=vendor \\
++			OPTIMIZE="\$(CFLAGS)" \\
+ 			INSTALLSITEMAN3DIR=$NGX_PERL_MODULES_MAN
+ 
+ END
+--- origsrc/nginx-1.10.0/src/http/modules/perl/Makefile.PL	2016-04-26 08:31:20.000000000 -0500
++++ src/nginx-1.10.0/src/http/modules/perl/Makefile.PL	2016-04-27 11:47:01.293752500 -0500
+@@ -16,6 +16,7 @@ WriteMakefile(
+     CCFLAGS           => "$ENV{NGX_PM_CFLAGS}",
+     OPTIMIZE          => '-O',
+ 
++    LIBS              => "-L../../../.. -lnginx -lnginx_perl",
+     INC               => join(" ", map {
+                              m#^/# ? "-I $_" : "-I ../../../../../$_"
+                          } (split /\s+/, $ENV{NGX_INCS})),

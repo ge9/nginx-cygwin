@@ -1,0 +1,63 @@
+--- origsrc/nginx-1.10.0/auto/os/conf	2016-04-26 08:31:19.000000000 -0500
++++ src/nginx-1.10.0/auto/os/conf	2016-04-27 11:32:39.461813700 -0500
+@@ -7,6 +7,10 @@ echo "checking for $NGX_SYSTEM specific
+ 
+ case "$NGX_PLATFORM" in
+ 
++    CYGWIN_NT*:*)
++        . auto/os/cygwin
++    ;;
++
+     FreeBSD:*)
+         . auto/os/freebsd
+     ;;
+--- origsrc/nginx-1.10.0/auto/os/cygwin	1969-12-31 18:00:00.000000000 -0600
++++ src/nginx-1.10.0/auto/os/cygwin	2016-04-27 11:40:07.295681400 -0500
+@@ -0,0 +1,13 @@
++have=NGX_CYGWIN . auto/have_headers
++
++CORE_INCS="$UNIX_INCS"
++CORE_DEPS="$UNIX_DEPS $POSIX_DEPS"
++CORE_SRCS="$UNIX_SRCS"
++
++ngx_pic_opt=-DPIC
++
++CC_AUX_FLAGS="$CC_AUX_FLAGS -D_GNU_SOURCE"
++MAIN_LINK="$MAIN_LINK -Wl,--export-all-symbols"
++MAIN_LINK="$MAIN_LINK -Wl,--out-implib,$NGX_OBJS/libnginx.a"
++MODULE_LINK="-shared -L $NGX_OBJS -lnginx"
++
+--- origsrc/nginx-1.10.0/auto/unix	2016-04-26 08:31:19.000000000 -0500
++++ src/nginx-1.10.0/auto/unix	2016-04-27 12:46:39.872674300 -0500
+@@ -151,7 +151,7 @@ fi
+ ngx_feature="crypt()"
+ ngx_feature_name=
+ ngx_feature_run=no
+-ngx_feature_incs=
++ngx_feature_incs="#include <crypt.h>"
+ ngx_feature_path=
+ ngx_feature_libs=
+ ngx_feature_test="crypt(\"test\", \"salt\");"
+@@ -163,7 +163,7 @@ if [ $ngx_found = no ]; then
+     ngx_feature="crypt() in libcrypt"
+     ngx_feature_name=
+     ngx_feature_run=no
+-    ngx_feature_incs=
++    ngx_feature_incs="#include <crypt.h>"
+     ngx_feature_path=
+     ngx_feature_libs=-lcrypt
+     . auto/feature
+@@ -765,11 +765,12 @@ ngx_feature="System V shared memory"
+ ngx_feature_name="NGX_HAVE_SYSVSHM"
+ ngx_feature_run=yes
+ ngx_feature_incs="#include <sys/ipc.h>
++                  #include <sys/stat.h>
+                   #include <sys/shm.h>"
+ ngx_feature_path=
+ ngx_feature_libs=
+ ngx_feature_test="int  id;
+-                  id = shmget(IPC_PRIVATE, 4096, (SHM_R|SHM_W|IPC_CREAT));
++                  id = shmget(IPC_PRIVATE, 4096, (S_IRUSR|S_IWUSR|IPC_CREAT));
+                   if (id == -1) return 1;
+                   shmctl(id, IPC_RMID, NULL);"
+ . auto/feature

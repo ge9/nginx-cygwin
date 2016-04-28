@@ -1,0 +1,11 @@
+--- origsrc/nginx-1.10.0/conf/nginx.conf	2016-04-26 08:31:19.000000000 -0500
++++ src/nginx-1.10.0/conf/nginx.conf	2016-04-28 03:12:00.635273800 -0500
+@@ -8,6 +8,8 @@ worker_processes  1;
+ 
+ #pid        logs/nginx.pid;
+ 
++# Load dynamic modules
++include /usr/share/nginx/modules/*.conf;
+ 
+ events {
+     worker_connections  1024;
