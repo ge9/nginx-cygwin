@@ -1,7 +1,7 @@
 inherit perl
 
 NAME="nginx"
-VERSION=1.10.3
+VERSION=1.12.1
 RELEASE=1
 CATEGORY="Web"
 SUMMARY="Web and mail proxy server"
@@ -13,11 +13,12 @@ SRC_URI+=" nginx.init"
 PATCH_URI="
 	1.10.0-auto-os-cygwin.patch
 	1.10.0-conf-modules.patch
-	1.10.0-openssl.patch
+	1.12.1-module-deps.patch
 	1.10.0-perl.patch
 "
 
 PKG_NAMES="nginx"
+nginx_OBSOLETES="nginx-mod_stream" # see below
 nginx_CONTENTS="
 	etc/defaults/etc/nginx/
 	etc/p*/*
@@ -28,7 +29,13 @@ nginx_CONTENTS="
 	usr/share/nginx/html/
 "
 
-modules=(http_geoip http_image_filter http_perl http_xslt_filter mail stream)
+# stream_geoip requires symbols from the stream module, which could be
+# (and was previously shipped) dynamic. Unfortunately, not only is it
+# hard to make one module depend on another, but then you also have to
+# assure they are loaded in the correct order.  Therefore, we just make
+# the stream module builtin instead.  FWIW, the stream module has the
+# same dependencies as the core, it just makes the core a bit larger.
+modules=(http_geoip http_image_filter http_perl http_xslt_filter mail stream_geoip)
 for mod in ${modules[*]}
 do
 	PKG_NAMES+=" nginx-mod_${mod}"
@@ -39,7 +46,7 @@ do
 done
 nginx_mod_http_perl_CONTENTS+=" ${PERL_VENDORARCH#/}"
 
-DEPS_PATH="/usr/sbin"
+DEPS_PATH="/usr/sbin:/usr/lib/nginx/modules"
 
 src_compile() {
 	lndirs
@@ -71,6 +78,7 @@ src_compile() {
 		--with-http_mp4_module \
 		--with-http_gunzip_module \
 		--with-http_gzip_static_module \
+		--with-http_auth_request_module \
 		--with-http_random_index_module \
 		--with-http_secure_link_module \
 		--with-http_degradation_module \
@@ -81,8 +89,11 @@ src_compile() {
 		--with-mail_ssl_module \
 		--with-pcre \
 		--with-pcre-jit \
-		--with-stream=dynamic \
+		--with-stream \
+		--with-stream_geoip_module=dynamic \
+		--with-stream_realip_module \
 		--with-stream_ssl_module \
+		--with-stream_ssl_preread_module \
 		--with-ipv6 \
 		--with-cc-opt="-DFD_SETSIZE=2048"
 

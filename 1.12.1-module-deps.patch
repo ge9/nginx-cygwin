@@ -1,0 +1,72 @@
+--- origsrc/nginx-1.12.1/auto/lib/openssl/conf	2017-07-11 08:24:06.000000000 -0500
++++ src/nginx-1.12.1/auto/lib/openssl/conf	2017-09-27 18:42:01.309043500 -0500
+@@ -115,6 +115,7 @@ else
+             have=NGX_SSL . auto/have
+             CORE_INCS="$CORE_INCS $ngx_feature_path"
+             CORE_LIBS="$CORE_LIBS $ngx_feature_libs"
++            NGX_LIB_OPENSSL="$ngx_feature_libs"
+             OPENSSL=YES
+         fi
+     fi
+--- origsrc/nginx-1.12.1/auto/lib/pcre/conf	2017-07-11 08:24:06.000000000 -0500
++++ src/nginx-1.12.1/auto/lib/pcre/conf	2017-09-27 18:57:00.350725800 -0500
+@@ -170,6 +170,7 @@ else
+         if [ $ngx_found = yes ]; then
+             CORE_INCS="$CORE_INCS $ngx_feature_path"
+             CORE_LIBS="$CORE_LIBS $ngx_feature_libs"
++            NGX_LIB_PCRE="$ngx_feature_libs"
+             PCRE=YES
+         fi
+ 
+--- origsrc/nginx-1.12.1/auto/lib/zlib/conf	2017-07-11 08:24:06.000000000 -0500
++++ src/nginx-1.12.1/auto/lib/zlib/conf	2017-09-27 18:57:27.135273100 -0500
+@@ -59,6 +59,7 @@ else
+ 
+         if [ $ngx_found = yes ]; then
+             CORE_LIBS="$CORE_LIBS $ngx_feature_libs"
++            NGX_LIB_ZLIB="$ngx_feature_libs"
+             ZLIB=YES
+             ngx_found=no
+         fi
+--- origsrc/nginx-1.12.1/auto/module	2017-07-11 08:24:06.000000000 -0500
++++ src/nginx-1.12.1/auto/module	2017-09-27 18:55:54.769103400 -0500
+@@ -44,7 +44,7 @@ if [ "$ngx_module_link" = DYNAMIC ]; the
+     do
+         case $lib in
+ 
+-            LIBXSLT | LIBGD | GEOIP | PERL)
++            LIBXSLT | LIBGD | GEOIP | PERL | OPENSSL | PCRE | ZLIB)
+                 libs="$libs \$NGX_LIB_$lib"
+ 
+                 if eval [ "\$USE_${lib}" = NO ] ; then
+@@ -52,10 +52,6 @@ if [ "$ngx_module_link" = DYNAMIC ]; the
+                 fi
+             ;;
+ 
+-            PCRE | OPENSSL | ZLIB)
+-                eval USE_${lib}=YES
+-            ;;
+-
+             MD5 | SHA1)
+                 # obsolete
+             ;;
+--- origsrc/nginx-1.12.1/auto/modules	2017-07-11 08:24:06.000000000 -0500
++++ src/nginx-1.12.1/auto/modules	2017-09-27 19:00:09.352293200 -0500
+@@ -1253,7 +1253,7 @@ if [ $MAIL != NO ]; then
+         ngx_module_incs=
+         ngx_module_deps=
+         ngx_module_srcs=$MAIL_SRCS
+-        ngx_module_libs=
++        ngx_module_libs=OPENSSL
+         ngx_module_link=DYNAMIC
+ 
+         . auto/module
+@@ -1273,7 +1273,7 @@ if [ $STREAM != NO ]; then
+         ngx_module_incs=
+         ngx_module_deps=
+         ngx_module_srcs=$STREAM_SRCS
+-        ngx_module_libs=
++        ngx_module_libs="OPENSSL PCRE ZLIB"
+         ngx_module_link=DYNAMIC
+ 
+         . auto/module
