@@ -1,7 +1,7 @@
 inherit perl
 
 NAME="nginx"
-VERSION=1.12.2
+VERSION=1.14.0
 RELEASE=1
 CATEGORY="Web"
 SUMMARY="Web and mail proxy server"
@@ -95,7 +95,7 @@ src_compile() {
 		--with-stream_ssl_module \
 		--with-stream_ssl_preread_module \
 		--with-ipv6 \
-		--with-cc-opt="-DFD_SETSIZE=2048"
+		--with-cc-opt="-DFD_SETSIZE=2048 -D_GNU_SOURCE"
 
 	cygmake -f objs/Makefile binary
 	cygmake -f objs/Makefile
