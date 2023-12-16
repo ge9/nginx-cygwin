@@ -1,13 +1,15 @@
 inherit perl
 
 NAME="nginx"
-VERSION=1.14.2
+VERSION=1.16.1
 RELEASE=1
 CATEGORY="Web"
 SUMMARY="Web and mail proxy server"
 DESCRIPTION="nginx [engine x] is an HTTP and reverse proxy server, a mail proxy
 server, and a generic TCP/UDP proxy server."
-HOMEPAGE="http://nginx.org/"
+HOMEPAGE="https://nginx.org/"
+LICENSE="BSD-2-Clause"
+
 SRC_URI="http://nginx.org/download/${NAME}-${VERSION}.tar.gz"
 SRC_URI+=" nginx.init"
 PATCH_URI="
@@ -16,6 +18,7 @@ PATCH_URI="
 	1.12.1-module-deps.patch
 	1.10.0-perl.patch
 "
+BUILD_REQUIRES="libcrypt-devel libgd-devel libpcre2-devel libssl-devel libxslt-devel perl zlib-devel"
 
 PKG_NAMES="nginx"
 nginx_OBSOLETES="nginx-mod_http_geoip nginx-mod_stream_geoip" # GeoIP Legacy
