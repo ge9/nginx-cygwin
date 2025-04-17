@@ -1,7 +1,7 @@
 inherit perl
 
 NAME="nginx"
-VERSION=1.24.0
+VERSION=1.27.4
 RELEASE=1
 CATEGORY="Web"
 SUMMARY="Web and mail proxy server"
@@ -10,7 +10,7 @@ server, and a generic TCP/UDP proxy server."
 HOMEPAGE="https://nginx.org/"
 LICENSE="BSD-2-Clause"
 
-SRC_URI="http://nginx.org/download/${NAME}-${VERSION}.tar.gz"
+SRC_URI="https://nginx.org/download/${NAME}-${VERSION}.tar.gz"
 SRC_URI+=" nginx.init"
 PATCH_URI="
 	1.10.0-auto-os-cygwin.patch

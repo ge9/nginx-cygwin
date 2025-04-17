@@ -23,7 +23,7 @@
 +ngx_pic_opt=-DPIC
 +
 +CC_AUX_FLAGS="$CC_AUX_FLAGS -D_GNU_SOURCE"
-+MAIN_LINK="$MAIN_LINK -Wl,--export-all-symbols"
++MAIN_LINK="$MAIN_LINK -Wl,--export-all-symbols -lcrypt"
 +MAIN_LINK="$MAIN_LINK -Wl,--out-implib,$NGX_OBJS/libnginx.a"
 +MODULE_LINK="-shared -L $NGX_OBJS -lnginx"
 +
